@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/_16dp">
+
+    <ImageView
+        android:id="@+id/songIcon"
+        android:layout_width="@dimen/_36dp"
+        android:layout_height="@dimen/_36dp"
+        android:contentDescription="@string/avatar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_icon_48" />
+
+    <TextView
+        android:id="@+id/author"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/songTitle"
+        app:layout_constraintEnd_toStartOf="@id/favouriteButton"
+        app:layout_constraintStart_toEndOf="@id/songIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="spread_inside"
+        tools:text="Linkin Park" />
+
+    <TextView
+        android:id="@+id/songTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_16dp"
+        android:maxLines="1"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="@id/songIcon"
+        app:layout_constraintEnd_toStartOf="@id/favouriteButton"
+        app:layout_constraintStart_toEndOf="@id/songIcon"
+        app:layout_constraintTop_toBottomOf="@id/author"
+        tools:text="Song title" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/favouriteButton"
+        style="@style/Widget.AppTheme.FavouriteButton"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:checkable="true"
+        android:contentDescription="@string/favourite_song"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/author"
+        app:icon="@drawable/ic_favourite_selector"
+        tools:checked="true"
+        tools:text=""
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

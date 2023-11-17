@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Медиаплеер</string>
+    <string name="avatar">аватарка</string>
+    <string name="favourite_song">Избранное</string>
+</resources>
