@@ -3,6 +3,7 @@ package ru.fox.media.activity
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
 import android.widget.SeekBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +15,8 @@ import ru.fox.media.room.Song
 import ru.fox.media.viewmodel.SongViewModel
 
 class AppActivity : AppCompatActivity() {
+    lateinit var runnable : Runnable
+    private var handler = Handler()
     var mediaPlayer: MediaPlayer = MediaPlayer()
     private var mediaRetriever = MediaMetadataRetriever()
 
@@ -144,6 +147,11 @@ class AppActivity : AppCompatActivity() {
             }
 
         })
+        var runnable = Runnable {
+            seekbar.progress = mediaPlayer.currentPosition
+            handler
+        }
+
 
         /*
                 findViewById<Button>(R.id.play).setOnClickListener {
