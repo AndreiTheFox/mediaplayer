@@ -1,6 +1,7 @@
 package ru.fox.media.activity
 
 import android.media.MediaMetadataRetriever
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.widget.SeekBar
 import androidx.activity.viewModels
@@ -13,19 +14,14 @@ import ru.fox.media.room.Song
 import ru.fox.media.viewmodel.SongViewModel
 
 class AppActivity : AppCompatActivity() {
-    private val mediaObserver = MediaLifecycleObserver()
-    private var mediaPlayer = mediaObserver.player
-    private var mediaRetriever =  MediaMetadataRetriever()
-
+    var mediaPlayer: MediaPlayer = MediaPlayer()
+    private var mediaRetriever = MediaMetadataRetriever()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val viewModel: SongViewModel by viewModels()
         val binding = AppActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         super.onCreate(savedInstanceState)
-
-        //Подписка на жизненный цикл активити
-        lifecycle.addObserver(observer = mediaObserver)
 
         val mySongs = listOf(R.raw.faint, R.raw.breaking_the_habit)
         var id = 0
@@ -64,13 +60,13 @@ class AppActivity : AppCompatActivity() {
 
         //Load song in player
         fun loadSongInPlayer() {
+            //Скидываем прогресс в 0 при новой песне
+            seekbar.progress = 0
             if (id == mySongs.size) {
                 id = 0
             }
             mediaPlayer.stop()
             mediaPlayer.reset()
-            seekbar.progress = 0
-
             //Загрузка песни в плеер
             val song = resources.openRawResourceFd(mySongs[id])
             mediaPlayer.setDataSource(song.fileDescriptor, song.startOffset, song.length)
@@ -78,12 +74,15 @@ class AppActivity : AppCompatActivity() {
 
             //Заполнение элементов интерфейса из файла песни
             mediaRetriever.setDataSource(song.fileDescriptor, song.startOffset, song.length)
-            val band = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST)
-            val songTitle = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
-            val albumName = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
+            val band =
+                mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST)
+            val songTitle =
+                mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+            val albumName =
+                mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
             val year = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
             val genre = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
-            binding.bandPlaying.text= band
+            binding.bandPlaying.text = band
             binding.songPlaying.text = songTitle
             binding.band.text = band
             binding.albumName.text = albumName
@@ -91,6 +90,7 @@ class AppActivity : AppCompatActivity() {
             binding.albumGenre.text = genre
 
             mediaPlayer.setOnPreparedListener {
+                //Получаем длительность тесни в трекбар
                 seekbar.max = mediaPlayer.duration
                 it.start()
             }
@@ -110,21 +110,23 @@ class AppActivity : AppCompatActivity() {
                     mediaPlayer.pause()
                 }
             }
-
         }
 
         mediaPlayer.setOnCompletionListener {
             binding.playButton.isChecked = false
-            seekbar.progress = 100
             it.reset()
         }
-
 
         binding.fab.setOnClickListener {
             id += 1
             binding.playButton.isChecked = false
             loadSongInPlayer()
         }
+
+//        if(mediaPlayer.isPlaying){
+//             seekbar.progress = mediaPlayer.duration
+//        }
+
 
         seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, pos: Int, changed: Boolean) {
@@ -152,6 +154,12 @@ class AppActivity : AppCompatActivity() {
                     }.play()
                 }
         */
-
     } //Конец onCreate
+
+    override fun onDestroy() {
+        super.onDestroy()
+        //Освободить ресурсы плеера при закрытии
+        mediaPlayer.release()
+    }
+
 }//Конец Activity
