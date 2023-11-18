@@ -68,6 +68,7 @@ class AppActivity : AppCompatActivity() {
 
             //Загрузка песни в плеер
             val song = resources.openRawResourceFd(mySongs[id])
+
             mediaPlayer.setDataSource(song.fileDescriptor, song.startOffset, song.length)
             mediaPlayer.prepareAsync()
 
@@ -146,6 +147,7 @@ class AppActivity : AppCompatActivity() {
 
 
         //Движение seekbar во время проигрывания песни
+        @Suppress("DEPRECATION")
         Handler().postDelayed(object : Runnable{
             override fun run() {
                 try {
