@@ -1,6 +1,5 @@
 package ru.fox.media.activity
 
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.widget.SeekBar
 import androidx.activity.viewModels
@@ -14,14 +13,21 @@ import ru.fox.media.viewmodel.SongViewModel
 
 class AppActivity : AppCompatActivity() {
     private val mediaObserver = MediaLifecycleObserver()
+    private var mediaPlayer = mediaObserver.player
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val viewModel: SongViewModel by viewModels()
         val binding = AppActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         super.onCreate(savedInstanceState)
 
-        val mySongs  = listOf(R.raw.faint, R.raw.breaking_the_habit)
+        //Подписка на жизненный цикл активити
+        lifecycle.addObserver(observer = mediaObserver)
 
+        val mySongs = listOf(R.raw.faint, R.raw.breaking_the_habit)
+        var id = 0
+        //TESTTTTTTTTTTTTTTTT
+//        val currentSong = MediaPlayer.create(this, mySongs[id])
 
         //Адаптер списка песен
         val adapter = SongAdapter(object : OnInteractionListener {
@@ -43,44 +49,67 @@ class AppActivity : AppCompatActivity() {
         //Привязка адаптера к RecyclerView
         binding.list.adapter = adapter
 
-        //Список песен из LiveData у viewModel
+        //Получим Список песен из LiveData у класса viewModel
         viewModel.data.observe(this) { songs ->
             adapter.submitList(songs)
         }
 
-        lifecycle.addObserver(mediaObserver)
-
-        var id = 0
-
-        //TESTTTTTTTTTTTTTTTT
-        val currentSong = MediaPlayer.create(this, mySongs[id])
-
-
         //Seekbar
         val seekbar = binding.seekbar
-        seekbar.progress = 0
-        seekbar.max = currentSong.duration
 
         //Кнопки управления плеером
 
-        binding.playButton.setOnClickListener {
-            if (!currentSong.isPlaying) {
-                currentSong.start()
-            } else {
-                currentSong.pause()
+        //Load song in player
+        fun loadSongInPlayer () {
+            if (id == mySongs.size) {
+                id = 0
             }
+            mediaPlayer.stop()
+            mediaPlayer.reset()
+            val song = resources.openRawResourceFd(mySongs[id])
+            mediaPlayer.setDataSource(song.fileDescriptor, song.startOffset, song.length)
+            mediaPlayer.prepareAsync()
+            mediaPlayer.setOnPreparedListener {
+                seekbar.progress = 0
+                seekbar.max = mediaPlayer.duration
+                it.start()
+            }
+        }
+
+        binding.playButton.setOnClickListener {
+            when {
+                mediaPlayer.currentPosition == 0 && !mediaPlayer.isPlaying -> {
+                    loadSongInPlayer()
+                }
+
+                !mediaPlayer.isPlaying -> {
+                    mediaPlayer.start()
+                }
+
+                else -> {
+                    mediaPlayer.pause()
+                }
+            }
+
+        }
+
+        mediaPlayer.setOnCompletionListener {
+            binding.playButton.isChecked = false
+            seekbar.progress = 0
+                it.reset()
         }
 
 
         binding.fab.setOnClickListener {
             id+=1
-            currentSong.selectTrack(id)
+            binding.playButton.isChecked = false
+            loadSongInPlayer()
         }
 
         seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, pos: Int, changed: Boolean) {
                 if (changed) {
-                    currentSong.seekTo(pos)
+                    mediaPlayer.seekTo(pos)
                 }
             }
 
@@ -94,13 +123,6 @@ class AppActivity : AppCompatActivity() {
 
         })
 
-        currentSong.setOnCompletionListener {
-            binding.playButton.isChecked = false
-            seekbar.progress = 0
-            it.release()
-        }
-
-
         /*
                 findViewById<Button>(R.id.play).setOnClickListener {
                     mediaObserver.apply {
@@ -110,8 +132,6 @@ class AppActivity : AppCompatActivity() {
                     }.play()
                 }
         */
-
-
 
     } //Конец onCreate
 }//Конец Activity
