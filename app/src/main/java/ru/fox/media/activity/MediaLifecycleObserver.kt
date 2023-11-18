@@ -7,14 +7,6 @@ import androidx.lifecycle.LifecycleOwner
 
 class MediaLifecycleObserver : LifecycleEventObserver {
     var player: MediaPlayer = MediaPlayer()
-
-//    fun play() {
-//        player.setOnPreparedListener {
-//            it.start()
-//        }
-//        player.prepareAsync()
-//    }
-
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
             Lifecycle.Event.ON_RESUME -> player.currentPosition

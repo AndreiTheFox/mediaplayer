@@ -5,9 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="6dp"
-    tools:context=".activity.AppActivity">
+    tools:context=".activity.AppActivity"
+    >
 
     <TextView
+        android:gravity="center"
         android:id="@+id/screenAlbum"
         android:layout_width="0dp"
         android:layout_height="24dp"
@@ -16,6 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:gravity="center"
         android:id="@+id/albumName"
         android:layout_width="0dp"
         android:layout_height="24dp"
@@ -27,6 +30,8 @@
         tools:text="Hybrid Teory" />
 
     <TextView
+        android:layout_marginTop="2dp"
+        android:gravity="center"
         android:id="@+id/infoSinger"
         android:layout_width="0dp"
         android:layout_height="@dimen/_18dp"
@@ -35,6 +40,8 @@
         app:layout_constraintTop_toBottomOf="@+id/screenAlbum" />
 
     <TextView
+        android:layout_marginTop="2dp"
+        android:gravity="center"
         android:id="@+id/band"
         android:layout_width="0dp"
         android:layout_height="@dimen/_18dp"
@@ -43,6 +50,8 @@
         tools:text="Linkin Park" />
 
     <TextView
+        android:layout_marginTop="2dp"
+        android:gravity="center"
         android:id="@+id/album_year"
         android:layout_width="0dp"
         android:layout_height="@dimen/_18dp"
@@ -51,6 +60,8 @@
         tools:text="2007" />
 
     <TextView
+        android:layout_marginTop="2dp"
+        android:gravity="center"
         android:id="@+id/album_genre"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/_18dp"

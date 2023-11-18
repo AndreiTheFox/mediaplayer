@@ -1,5 +1,6 @@
 package ru.fox.media.activity
 
+import android.media.MediaMetadataRetriever
 import android.os.Bundle
 import android.widget.SeekBar
 import androidx.activity.viewModels
@@ -14,6 +15,8 @@ import ru.fox.media.viewmodel.SongViewModel
 class AppActivity : AppCompatActivity() {
     private val mediaObserver = MediaLifecycleObserver()
     private var mediaPlayer = mediaObserver.player
+    private var mediaRetriever =  MediaMetadataRetriever()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val viewModel: SongViewModel by viewModels()
@@ -60,17 +63,34 @@ class AppActivity : AppCompatActivity() {
         //Кнопки управления плеером
 
         //Load song in player
-        fun loadSongInPlayer () {
+        fun loadSongInPlayer() {
             if (id == mySongs.size) {
                 id = 0
             }
             mediaPlayer.stop()
             mediaPlayer.reset()
+            seekbar.progress = 0
+
+            //Загрузка песни в плеер
             val song = resources.openRawResourceFd(mySongs[id])
             mediaPlayer.setDataSource(song.fileDescriptor, song.startOffset, song.length)
             mediaPlayer.prepareAsync()
+
+            //Заполнение элементов интерфейса из файла песни
+            mediaRetriever.setDataSource(song.fileDescriptor, song.startOffset, song.length)
+            val band = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST)
+            val songTitle = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+            val albumName = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
+            val year = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
+            val genre = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
+            binding.bandPlaying.text= band
+            binding.songPlaying.text = songTitle
+            binding.band.text = band
+            binding.albumName.text = albumName
+            binding.albumYear.text = year
+            binding.albumGenre.text = genre
+
             mediaPlayer.setOnPreparedListener {
-                seekbar.progress = 0
                 seekbar.max = mediaPlayer.duration
                 it.start()
             }
@@ -95,13 +115,13 @@ class AppActivity : AppCompatActivity() {
 
         mediaPlayer.setOnCompletionListener {
             binding.playButton.isChecked = false
-            seekbar.progress = 0
-                it.reset()
+            seekbar.progress = 100
+            it.reset()
         }
 
 
         binding.fab.setOnClickListener {
-            id+=1
+            id += 1
             binding.playButton.isChecked = false
             loadSongInPlayer()
         }
