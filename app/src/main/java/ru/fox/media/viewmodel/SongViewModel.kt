@@ -11,7 +11,7 @@ class SongViewModel(application: Application) : AndroidViewModel(application) {
         Repository(SongDb.getInstance(context = application).postDao())
     val data = repository.getAll()
     fun favouriteById(id: Long) = repository.favouriteById(id)
-
+    fun getAlbum() = repository.loadAlbum()
     var newId : Long = 0L
     fun save() {
         val song = Song(

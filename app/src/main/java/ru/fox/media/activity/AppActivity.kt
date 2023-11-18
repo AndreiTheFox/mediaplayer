@@ -24,7 +24,7 @@ class AppActivity : AppCompatActivity() {
         val binding = AppActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         super.onCreate(savedInstanceState)
-
+        viewModel.getAlbum()
         val mySongs = listOf(R.raw.faint, R.raw.breaking_the_habit)
         var id = 0
 
