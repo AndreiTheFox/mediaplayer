@@ -15,8 +15,6 @@ import ru.fox.media.room.Song
 import ru.fox.media.viewmodel.SongViewModel
 
 class AppActivity : AppCompatActivity() {
-    lateinit var runnable : Runnable
-    private var handler = Handler()
     var mediaPlayer: MediaPlayer = MediaPlayer()
     private var mediaRetriever = MediaMetadataRetriever()
 
@@ -28,13 +26,11 @@ class AppActivity : AppCompatActivity() {
 
         val mySongs = listOf(R.raw.faint, R.raw.breaking_the_habit)
         var id = 0
-        //TESTTTTTTTTTTTTTTTT
-//        val currentSong = MediaPlayer.create(this, mySongs[id])
 
         //Адаптер списка песен
         val adapter = SongAdapter(object : OnInteractionListener {
             override fun onSongClick(song: Song) {
-                //Play music if stop. Stop if play.
+                //Put Song in Mediaplayer and change metadata in player
             }
 
             //Mark as favourite in repository
@@ -59,17 +55,17 @@ class AppActivity : AppCompatActivity() {
         //Seekbar
         val seekbar = binding.seekbar
 
-        //Кнопки управления плеером
-
         //Load song in player
         fun loadSongInPlayer() {
             //Скидываем прогресс в 0 при новой песне
             seekbar.progress = 0
+            //Если последняя песня, то берем первую песню из списка
             if (id == mySongs.size) {
                 id = 0
             }
             mediaPlayer.stop()
             mediaPlayer.reset()
+
             //Загрузка песни в плеер
             val song = resources.openRawResourceFd(mySongs[id])
             mediaPlayer.setDataSource(song.fileDescriptor, song.startOffset, song.length)
@@ -93,7 +89,7 @@ class AppActivity : AppCompatActivity() {
             binding.albumGenre.text = genre
 
             mediaPlayer.setOnPreparedListener {
-                //Получаем длительность тесни в трекбар
+                //Записываем длительность песни в трекбар
                 seekbar.max = mediaPlayer.duration
                 it.start()
             }
@@ -147,10 +143,21 @@ class AppActivity : AppCompatActivity() {
             }
 
         })
-        var runnable = Runnable {
-            seekbar.progress = mediaPlayer.currentPosition
-            handler
-        }
+
+
+        //Движение seekbar во время проигрывания песни
+        Handler().postDelayed(object : Runnable{
+            override fun run() {
+                try {
+                    seekbar.progress = mediaPlayer.currentPosition
+                    Handler().postDelayed(this,1000)
+                }
+                catch (e:Exception){
+                    println(e.stackTrace)
+                }
+            }
+
+        }, 0)
 
 
         /*
