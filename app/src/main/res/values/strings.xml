@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Mediaplayer</string>
-    <string name="avatar">avatar</string>
+    <string name="playButton">avatar</string>
     <string name="favourite_song">Favourite</string>
-    <string name="fab" translatable="false">fab</string>
+    <string name="fab">fab</string>
+    <string name="album">ALBUM:</string>
+    <string name="info_singer">Band:</string>
 </resources>

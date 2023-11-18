@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Медиаплеер</string>
-    <string name="avatar">аватарка</string>
+    <string name="playButton">аватарка</string>
     <string name="favourite_song">Избранное</string>
+    <string name="fab">фаб</string>
+    <string name="album">АЛЬБОМ:</string>
+    <string name="info_singer">Исполнитель:</string>
 </resources>
