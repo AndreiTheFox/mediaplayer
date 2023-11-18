@@ -4,6 +4,7 @@ import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.widget.SeekBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -146,19 +147,18 @@ class AppActivity : AppCompatActivity() {
         })
 
 
-        //Движение seekbar во время проигрывания песни
-        @Suppress("DEPRECATION")
-        Handler().postDelayed(object : Runnable{
+//        //Движение seekbar во время проигрывания песни
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed(object : Runnable{
             override fun run() {
                 try {
                     seekbar.progress = mediaPlayer.currentPosition
-                    Handler().postDelayed(this,1000)
+                    handler.postDelayed(this,1000)
                 }
                 catch (e:Exception){
                     println(e.stackTrace)
                 }
             }
-
         }, 0)
 
 
