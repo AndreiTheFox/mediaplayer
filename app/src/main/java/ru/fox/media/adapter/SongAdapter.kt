@@ -10,7 +10,7 @@ import ru.fox.media.room.Song
 
 interface OnInteractionListener {
     fun onFavourite(song: Song){}
-    fun onSongClick(song: Song){}
+    fun onPlaySongClick(song: Song){}
 }
 class SongAdapter(private val onInteractionListener: OnInteractionListener) :
     ListAdapter<Song, SongViewHolder>(PostDiffCallback()) {
@@ -36,6 +36,9 @@ class SongViewHolder(
             favouriteButton.isChecked = song.favourite
             favouriteButton.setOnClickListener {
                 onInteractionListener.onFavourite(song)
+            }
+            playButton.setOnClickListener {
+                onInteractionListener.onPlaySongClick(song)
             }
         }
     }

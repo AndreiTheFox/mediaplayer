@@ -8,7 +8,6 @@ import android.os.Looper
 import android.widget.SeekBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import ru.fox.media.R
 import ru.fox.media.adapter.OnInteractionListener
 import ru.fox.media.adapter.SongAdapter
 import ru.fox.media.databinding.AppActivityBinding
@@ -19,7 +18,8 @@ import java.io.File
 
 class AppActivity : AppCompatActivity() {
 
-
+    private val songBaseUrl =
+        "https://raw.githubusercontent.com/netology-code/andad-homeworks/master/09_multimedia/data/"
 
     var mediaPlayer: MediaPlayer = MediaPlayer()
     private var mediaRetriever = MediaMetadataRetriever()
@@ -30,8 +30,9 @@ class AppActivity : AppCompatActivity() {
         setContentView(binding.root)
         super.onCreate(savedInstanceState)
         viewModel.getAlbum()
-
-        val mySongs = listOf(R.raw.faint, R.raw.breaking_the_habit)
+        //Seekbar
+        val seekbar = binding.seekbar
+//        val mySongs = listOf(R.raw.faint, R.raw.breaking_the_habit)
         var id = 0
 
         //Создание каталога для песен
@@ -39,8 +40,48 @@ class AppActivity : AppCompatActivity() {
 
         //Адаптер списка песен
         val adapter = SongAdapter(object : OnInteractionListener {
-            override fun onSongClick(song: Song) {
+            override fun onPlaySongClick(song: Song) {
                 //Put Song in Mediaplayer and change metadata in player
+
+                //Скидываем прогресс в 0 при новой песне
+                seekbar.progress = 0
+                //Если последняя песня, то берем первую песню из списка
+                if (id == viewModel.data.value?.size) {
+                    id = 0
+                }
+                mediaPlayer.stop()
+                mediaPlayer.reset()
+
+                //Загрузка песни в плеер
+//            val song = resources.openRawResourceFd(R.raw.faint)
+
+                val songUrl = songBaseUrl+ song.url
+                mediaPlayer.setDataSource(songUrl)
+                mediaPlayer.prepareAsync()
+
+                //Заполнение элементов интерфейса из файла песни
+                mediaRetriever.setDataSource(songUrl)
+                val band =
+                    mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST)
+                val songTitle =
+                    mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+                val albumName =
+                    mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
+                val year = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
+                val genre = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
+                binding.bandPlaying.text = band
+                binding.songPlaying.text = songTitle
+                binding.band.text = band
+                binding.albumName.text = albumName
+                binding.albumYear.text = year
+                binding.albumGenre.text = genre
+
+                mediaPlayer.setOnPreparedListener {
+                    //Записываем длительность песни в трекбар
+                    seekbar.max = mediaPlayer.duration
+                    it.start()
+                }
+                binding.playButton.isChecked = mediaPlayer.isPlaying
             }
 
             //Mark as favourite in repository
@@ -49,11 +90,6 @@ class AppActivity : AppCompatActivity() {
             }
         })
 
-        //Тест сохранения в БД
-//        binding.fab.setOnClickListener {
-//            viewModel.save()
-//        }
-
         //Привязка адаптера к RecyclerView
         binding.list.adapter = adapter
 
@@ -61,61 +97,15 @@ class AppActivity : AppCompatActivity() {
         viewModel.data.observe(this) { songs ->
             adapter.submitList(songs)
         }
-
-        //Seekbar
-        val seekbar = binding.seekbar
-
         //Load song in player
-        fun loadSongInPlayer() {
-            //Скидываем прогресс в 0 при новой песне
-            seekbar.progress = 0
-            //Если последняя песня, то берем первую песню из списка
-            if (id == mySongs.size) {
-                id = 0
-            }
-            mediaPlayer.stop()
-            mediaPlayer.reset()
-
-            //Загрузка песни в плеер
-            val song = resources.openRawResourceFd(mySongs[id])
-
-            mediaPlayer.setDataSource(song.fileDescriptor, song.startOffset, song.length)
-            mediaPlayer.prepareAsync()
-
-            //Заполнение элементов интерфейса из файла песни
-            mediaRetriever.setDataSource(song.fileDescriptor, song.startOffset, song.length)
-            val band =
-                mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST)
-            val songTitle =
-                mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
-            val albumName =
-                mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
-            val year = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
-            val genre = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
-            binding.bandPlaying.text = band
-            binding.songPlaying.text = songTitle
-            binding.band.text = band
-            binding.albumName.text = albumName
-            binding.albumYear.text = year
-            binding.albumGenre.text = genre
-
-            mediaPlayer.setOnPreparedListener {
-                //Записываем длительность песни в трекбар
-                seekbar.max = mediaPlayer.duration
-                it.start()
-            }
-        }
-
         binding.playButton.setOnClickListener {
             when {
-                mediaPlayer.currentPosition == 0 && !mediaPlayer.isPlaying -> {
-                    loadSongInPlayer()
-                }
-
+//                mediaPlayer.currentPosition == 0 && !mediaPlayer.isPlaying -> {
+//                    loadSongInPlayer()
+//                }
                 !mediaPlayer.isPlaying -> {
                     mediaPlayer.start()
                 }
-
                 else -> {
                     mediaPlayer.pause()
                 }
@@ -127,34 +117,17 @@ class AppActivity : AppCompatActivity() {
             it.reset()
         }
 
-        binding.fab.setOnClickListener {
-            id += 1
-            binding.playButton.isChecked = false
-            loadSongInPlayer()
-        }
-
-//        if(mediaPlayer.isPlaying){
-//             seekbar.progress = mediaPlayer.duration
-//        }
-
-
         seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, pos: Int, changed: Boolean) {
                 if (changed) {
                     mediaPlayer.seekTo(pos)
                 }
             }
-
             override fun onStartTrackingTouch(p0: SeekBar?) {
-
             }
-
             override fun onStopTrackingTouch(p0: SeekBar?) {
-
             }
-
         })
-
 
 //        //Движение seekbar во время проигрывания песни
         val handler = Handler(Looper.getMainLooper())
@@ -169,17 +142,6 @@ class AppActivity : AppCompatActivity() {
                 }
             }
         }, 0)
-
-
-        /*
-                findViewById<Button>(R.id.play).setOnClickListener {
-                    mediaObserver.apply {
-                        player?.setDataSource(
-                            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-                        )
-                    }.play()
-                }
-        */
     } //Конец onCreate
 
     override fun onDestroy() {
