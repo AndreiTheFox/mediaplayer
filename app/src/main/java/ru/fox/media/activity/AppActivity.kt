@@ -14,8 +14,13 @@ import ru.fox.media.adapter.SongAdapter
 import ru.fox.media.databinding.AppActivityBinding
 import ru.fox.media.room.Song
 import ru.fox.media.viewmodel.SongViewModel
+import java.io.File
+
 
 class AppActivity : AppCompatActivity() {
+
+
+
     var mediaPlayer: MediaPlayer = MediaPlayer()
     private var mediaRetriever = MediaMetadataRetriever()
 
@@ -25,8 +30,12 @@ class AppActivity : AppCompatActivity() {
         setContentView(binding.root)
         super.onCreate(savedInstanceState)
         viewModel.getAlbum()
+
         val mySongs = listOf(R.raw.faint, R.raw.breaking_the_habit)
         var id = 0
+
+        //Создание каталога для песен
+        val folder = File(filesDir,"songs").mkdir()
 
         //Адаптер списка песен
         val adapter = SongAdapter(object : OnInteractionListener {
@@ -178,5 +187,6 @@ class AppActivity : AppCompatActivity() {
         //Освободить ресурсы плеера при закрытии
         mediaPlayer.release()
     }
+
 
 }//Конец Activity
