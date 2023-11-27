@@ -24,6 +24,7 @@ class AppActivity : AppCompatActivity() {
     var mediaPlayer: MediaPlayer = MediaPlayer()
     private var mediaRetriever = MediaMetadataRetriever()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val viewModel: SongViewModel by viewModels()
         val binding = AppActivityBinding.inflate(layoutInflater)
@@ -32,30 +33,46 @@ class AppActivity : AppCompatActivity() {
         viewModel.getAlbum()
         //Seekbar
         val seekbar = binding.seekbar
-//        val mySongs = listOf(R.raw.faint, R.raw.breaking_the_habit)
+        val songs = viewModel.data
         var id = 0
 
         //Создание каталога для песен
-        val folder = File(filesDir,"songs").mkdir()
+        val folder = File(filesDir, "songs").mkdir()
 
         //Адаптер списка песен
         val adapter = SongAdapter(object : OnInteractionListener {
             override fun onPlaySongClick(song: Song) {
-                //Put Song in Mediaplayer and change metadata in player
 
-                //Скидываем прогресс в 0 при новой песне
-                seekbar.progress = 0
+                //Нажали кнопку плей в листе
+
                 //Если последняя песня, то берем первую песню из списка
                 if (id == viewModel.data.value?.size) {
                     id = 0
                 }
-                mediaPlayer.stop()
+
+
+                //Иначе
+                println(song)
+                println(viewModel.data.value?.get(song.id.toInt())?.playing)
+                //Если медиа плеер уже играет, то остановим
+                if (mediaPlayer.isPlaying) {
+                    mediaPlayer.stop()
+
+                }
+
+
+                //Если для воспроизведения выбрана другая песня, не важно играет медиаплеер при этом или нет
+                //  TODO()         if (song != ) {
+                //Скидываем прогресс в 0 при новой песне
+                seekbar.progress = 0
+                //Скидываем медиаплеер в начало воспроизведения
                 mediaPlayer.reset()
+                //         }
 
-                //Загрузка песни в плеер
-//            val song = resources.openRawResourceFd(R.raw.faint)
 
-                val songUrl = songBaseUrl+ song.url
+                //Put Song in Mediaplayer and change metadata in player
+
+                val songUrl = songBaseUrl + song.url
                 mediaPlayer.setDataSource(songUrl)
                 mediaPlayer.prepareAsync()
 
@@ -68,7 +85,8 @@ class AppActivity : AppCompatActivity() {
                 val albumName =
                     mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM)
                 val year = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR)
-                val genre = mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
+                val genre =
+                    mediaRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE)
                 binding.bandPlaying.text = band
                 binding.songPlaying.text = songTitle
                 binding.band.text = band
@@ -81,7 +99,6 @@ class AppActivity : AppCompatActivity() {
                     seekbar.max = mediaPlayer.duration
                     it.start()
                 }
-                binding.playButton.isChecked = mediaPlayer.isPlaying
             }
 
             //Mark as favourite in repository
@@ -97,8 +114,9 @@ class AppActivity : AppCompatActivity() {
         viewModel.data.observe(this) { songs ->
             adapter.submitList(songs)
         }
+
         //Load song in player
-        binding.playButton.setOnClickListener {
+        binding.playCurrentSongInMediaPlayer.setOnClickListener {
             when {
 //                mediaPlayer.currentPosition == 0 && !mediaPlayer.isPlaying -> {
 //                    loadSongInPlayer()
@@ -106,6 +124,7 @@ class AppActivity : AppCompatActivity() {
                 !mediaPlayer.isPlaying -> {
                     mediaPlayer.start()
                 }
+
                 else -> {
                     mediaPlayer.pause()
                 }
@@ -113,7 +132,7 @@ class AppActivity : AppCompatActivity() {
         }
 
         mediaPlayer.setOnCompletionListener {
-            binding.playButton.isChecked = false
+            binding.playCurrentSongInMediaPlayer.isChecked = false
             it.reset()
         }
 
@@ -123,21 +142,22 @@ class AppActivity : AppCompatActivity() {
                     mediaPlayer.seekTo(pos)
                 }
             }
+
             override fun onStartTrackingTouch(p0: SeekBar?) {
             }
+
             override fun onStopTrackingTouch(p0: SeekBar?) {
             }
         })
 
 //        //Движение seekbar во время проигрывания песни
         val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed(object : Runnable{
+        handler.postDelayed(object : Runnable {
             override fun run() {
                 try {
                     seekbar.progress = mediaPlayer.currentPosition
-                    handler.postDelayed(this,1000)
-                }
-                catch (e:Exception){
+                    handler.postDelayed(this, 1000)
+                } catch (e: Exception) {
                     println(e.stackTrace)
                 }
             }

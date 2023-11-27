@@ -48,7 +48,8 @@ class Repository(private val dao: SongDao) {
                                 author = "${album?.artist}",
                                 title = "${track.file}",
                                 favourite = false,
-                                url = "${track.file}"
+                                url = "${track.file}",
+                                playing = false
                             )
                             save(newSong)
                         }
@@ -117,5 +118,9 @@ class Repository(private val dao: SongDao) {
     fun save(song: Song) {
         dao.insert(SongEntity.fromDto(song))
         println("добавлена запись с ID: ${song.id}")
+    }
+
+    fun songPlaying(song: Song, playing: Boolean) {
+            dao.updateContentByUd(song.id, playing )
     }
 }

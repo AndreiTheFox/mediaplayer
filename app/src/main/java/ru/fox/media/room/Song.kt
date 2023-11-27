@@ -6,4 +6,5 @@ data class Song(
     val title: String,
     val favourite: Boolean = false,
     val url: String,
+    val playing: Boolean,
 )

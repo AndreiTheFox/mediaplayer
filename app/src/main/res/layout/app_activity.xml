@@ -78,7 +78,7 @@
         app:constraint_referenced_ids="album_genre, album_year" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/playButton"
+        android:id="@+id/playCurrentSongInMediaPlayer"
         style="@style/Widget.AppTheme.PlayButton"
         android:layout_width="@dimen/_48dp"
         android:layout_height="@dimen/_48dp"
@@ -94,8 +94,8 @@
     android:layout_marginStart="@dimen/_8dp"
     android:layout_width="wrap_content"
     android:layout_height="18dp"
-    app:layout_constraintStart_toEndOf="@+id/playButton"
-    app:layout_constraintTop_toTopOf="@+id/playButton"
+    app:layout_constraintStart_toEndOf="@+id/playCurrentSongInMediaPlayer"
+    app:layout_constraintTop_toTopOf="@+id/playCurrentSongInMediaPlayer"
     android:textStyle="bold"
     tools:text="Играет Исполнитель"
     />
@@ -103,8 +103,8 @@
 <TextView
     android:id="@+id/songPlaying"
     android:layout_marginStart="@dimen/_8dp"
-    app:layout_constraintStart_toEndOf="@+id/playButton"
-    app:layout_constraintBottom_toBottomOf="@+id/playButton"
+    app:layout_constraintStart_toEndOf="@+id/playCurrentSongInMediaPlayer"
+    app:layout_constraintBottom_toBottomOf="@+id/playCurrentSongInMediaPlayer"
     android:layout_width="wrap_content"
     android:layout_height="18dp"
     tools:text="Песня"

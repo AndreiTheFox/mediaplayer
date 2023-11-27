@@ -37,7 +37,7 @@ class SongViewHolder(
             favouriteButton.setOnClickListener {
                 onInteractionListener.onFavourite(song)
             }
-            playButton.setOnClickListener {
+            playSongInList.setOnClickListener {
                 onInteractionListener.onPlaySongClick(song)
             }
         }

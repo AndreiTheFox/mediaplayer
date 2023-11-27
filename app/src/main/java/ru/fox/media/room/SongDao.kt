@@ -14,11 +14,10 @@ interface SongDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(song: SongEntity)
 
-    @Query("UPDATE SongEntity SET title = :title WHERE id = :id")
-    fun updateContentByUd(id: Long, title: String)
+    @Query("UPDATE SongEntity SET playing = :playing WHERE id = :id")
+    fun updateContentByUd(id: Long, playing: Boolean)
 
-    fun save(post: SongEntity) =
-        if (post.id == 0L) insert(post) else updateContentByUd(post.id, post.title)
+    fun save(song: SongEntity) = insert(song)
 
     @Query(
         """

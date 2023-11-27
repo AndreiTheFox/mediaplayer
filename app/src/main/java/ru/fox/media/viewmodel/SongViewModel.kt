@@ -20,8 +20,11 @@ class SongViewModel(application: Application) : AndroidViewModel(application) {
             title = " Song",
             favourite = false,
             url = "bla bla bla",
+            playing = false,
         )
         repository.save(song)
         newId += 1L
     }
+
+    fun songPlaying(song :Song, playing: Boolean)= repository.songPlaying(song, playing)
 }
